@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>CBOpenData</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Slabo+27px">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/Contact-Form-Clean.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/Social-Icons.css') }}">
+        <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
+        <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+        <script>
+            var mapbox_access_key = '{{ mapbox_access_key }}';
+            var map_id = '{{ map.id }}';
+            var map_container = '{{ map.container }}';
+            var map_style = 'mapbox://styles/mapbox/' + '{{ map.style }}' + '-v9';
+            var map_center = [{{ map.lat }},{{ map.lng }}];
+            var map_zoom = {{ map.zoom }};
+            var sources = [];
+            var layers = [];
+            {% for source in map.sources %}
+                source_json = {};
+                source_json["name"] = '{{ source.id }}';
+                source_json["data"] = {
+                    "type": '{{ source.type }}',
+                    "file": '{{ url_for("static", filename="data/") }}'+'{{ source.id }}/{{ source.file }}'
+                };
+                sources.push(source_json);
+            {% endfor %}
+            {% for layer in map.layers %}
+                layer_json = {};
+                layer_json["id"] = '{{ layer.id }}';
+                layer_json["type"] = '{{ layer.type }}';
+                layer_json["source"] = '{{ layer.data_set_id }}';
+                layer_json["source-layer"] = '{{ layer.source_layer }}';
+                layer_json["layout"] = JSON.parse({{ layer.layout|tojson }});
+                layer_json["paint"] = JSON.parse({{ layer.paint|tojson }});
+                layer_json["popup"] = null;
+                {% for popup in layer.popups %}
+                    layer_json["popup"] = {
+                        "title": '{{ popup.title }}',
+                        "subtitle": '{{ popup.subtitle }}',
+                        "properties": '{{ popup.properties }}'
+                    };
+                {% endfor %}
+                layers.push(layer_json);
+            {% endfor %}
+        </script>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+    </head>
+
+    <body>
+        <div id="map-container">
+            <h1 class="map-title">{{ map.title }}</h1>
+            <p>by <a class="map-owner" href="../user/{{ map.user.id }}">{{ map.user.username }}</a></p>
+            <div id="map" style='position:absolute; width: 600px; height: 450px;'></div>
+            <div id='menu' style='position: absolute;'></div>
+            <div id="map-spacer" style='width: 600px; height: 450px;'></div>
+            <p><a class="likes-link" href="{{ map.id }}/likes">{{ map.likes.count() }}</a>
+                <span class="like-button{% if map in current_user.liked_maps %} liked{% endif %}">likes</span></p>
+            <p><a class="reposts-link" href="{{ map.id }}/reposts">{{ map.reposts.count() }}</a>
+                <span class="repost-button{% if map in current_user.reposted_maps %} reposted{% endif %}">reposts</span></p>
+            <p class="map-description">{{ map.description }}</p>
+            <p class="map-tags">
+                {% for tag in map.tags %}
+                    <a class="map-tag" href="../tag/{{ tag.id }}">#{{ tag.name }}</a>
+                {% endfor %}
+            </p>
+            <p>Sources:</p>
+            <ul class="map-sources-list">
+            {% for source in map.sources %}
+                <li class="map-source"><a class="map-source-link" href="../dataset/{{ source.id }}">{{ source.title }}</a></li>
+            {% endfor %}
+            </ul>
+
+
+        </div>
+
+        <!--TODO: Make this prettier and add to datasets, followers, and reposts-->
+        <script>
+            {% if map in current_user.liked_maps %}
+                var liked = true;
+            {% else %}
+                var liked = false;
+            {% endif %}
+            $('span.like-button').bind('click', function() {
+                $(this).toggleClass("liked");
+                $.ajax('/like/map/{{ map.id }}');
+                if (liked) {
+                    $(this).parent().find('a').html(parseInt($(this).parent().find('a').html(), 10)-1)
+                } else {
+                    $(this).parent().find('a').html(parseInt($(this).parent().find('a').html(), 10)+1)
+                }
+                liked = !liked;
+            });
+            {% if map in current_user.reposted_maps %}
+                var reposted = true;
+            {% else %}
+                var reposted = false;
+            {% endif %}
+            $('span.repost-button').bind('click', function() {
+                $(this).toggleClass("reposted");
+                $.ajax('/repost/map/{{ map.id }}');
+                if (reposted) {
+                    $(this).parent().find('a').html(parseInt($(this).parent().find('a').html(), 10)-1)
+                } else {
+                    $(this).parent().find('a').html(parseInt($(this).parent().find('a').html(), 10)+1)
+                }
+                reposted = !reposted;
+            });
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+        <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+        {% if map.js != None %}
+            <script src="{{ url_for('static', filename=map.js) }}"></script>
+        {% endif %}
+    </body>
+
+</html>

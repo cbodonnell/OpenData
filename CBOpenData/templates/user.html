@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>CBOpenData</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Slabo+27px">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/Contact-Form-Clean.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/Social-Icons.css') }}">
+        <script>
+
+        </script>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+    </head>
+
+    <body>
+        <div id="user-container">
+            <h1 class="username">{{ user.username }}</h1>
+            <p><a class="followers-link" href="{{ user.id }}/followers">{{ user.followers.count() }}</a>
+                <span class="follow-button{% if user in current_user.followed %} followed{% endif %}">followers</span></p>
+            <p class="following"><a class="following-link" href="{{ user.id }}/following">{{ user.followed.count() }}</a> following</p>
+            <p class="likes"><a class="liked-link" href="{{ user.id }}/liked">{{ user.liked_maps.count() + user.liked_data_sets.count() }}</a> likes</p>
+            <p class="reposts"><a class="reposted-link" href="{{ user.id }}/reposted">{{ user.reposted_maps.count() + user.reposted_data_sets.count() }}</a> reposts</p>
+            <p>Maps:</p>
+            <ul class="maps-list">
+                {% for map in user.maps %}
+                    <li><a href="../map/{{ map.id }}">{{ map.title }}</a></li>
+                {% endfor %}
+            </ul>
+            <p>Datasets:</p>
+            <ul class="datasets-list">
+                {% for dataset in user.datasets %}
+                    <li><a href="../dataset/{{ dataset.id }}">{{ dataset.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <script>
+            {% if user in current_user.followed %}
+                var followed = true;
+            {% else %}
+                var followed = false;
+            {% endif %}
+            $('span.follow-button').bind('click', function() {
+                $(this).toggleClass("followed");
+                $.ajax('/follow/{{ user.id }}');
+                if (followed) {
+                    $(this).parent().find('a').html(parseInt($(this).parent().find('a').html(), 10)-1)
+                } else {
+                    $(this).parent().find('a').html(parseInt($(this).parent().find('a').html(), 10)+1)
+                }
+                followed = !followed;
+            });
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+        <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/user.js') }}"></script>
+    </body>
+
+</html>

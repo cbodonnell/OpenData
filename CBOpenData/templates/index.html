@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>CBOpenData</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Slabo+27px">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/Contact-Form-Clean.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/Social-Icons.css') }}">
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    </head>
+
+    <body>
+        {% if current_user.is_anonymous %}
+            <h1>Welcome to the index view</h1>
+        {% else %}
+            <h1>Welcome to the index view {{ current_user.username }}!</h1>
+        {% endif %}
+        <p><a href="map/1">Map view test</a></p>
+        <p><a href="user/3">User view test</a></p>
+        {% if current_user.is_anonymous %}
+            <p><a href="{{ url_for('login') }}">Sign In</a></p>
+            <p>New User? <a href="{{ url_for('register') }}">Click to Register</a></p>
+        {% else %}
+            <p><a href="{{ url_for('stream_view') }}">{{ current_user.username }}'s stream</a></p>
+            <p><a href="{{ url_for('logout') }}">Sign Out</a></p>
+        {% endif %}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+        <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    </body>
+
+</html>

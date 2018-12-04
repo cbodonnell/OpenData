@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>CBOpenData</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Slabo+27px">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/Contact-Form-Clean.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/Social-Icons.css') }}">
+        <script>
+
+        </script>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+    </head>
+
+    <body>
+        <div id="tag-container">
+            <h1>#{{ tag.name }}</h1>
+            <p>Maps:</p>
+            <ul class="tagged-maps-list">
+                {% for map in tag.tagged_maps %}
+                    <li><a class="map-link" href="../../map/{{ map.id }}">{{ map.title }}</a></li>
+                {% endfor %}
+            </ul>
+            <p>Datasets:</p>
+            <ul class="tagged-datasets-list">
+                {% for dataset in tag.tagged_data_sets %}
+                    <li><a class="dataset-link" href="../../dataset/{{ dataset.id }}">{{ dataset.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+        <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    </body>
+
+</html>
